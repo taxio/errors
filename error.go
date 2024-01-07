@@ -6,11 +6,6 @@ import (
 
 type stack []uintptr
 
-type Attr struct {
-	key   string
-	value any
-}
-
 type Error struct {
 	message string
 	err     error

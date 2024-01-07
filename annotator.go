@@ -23,8 +23,18 @@ func WithStack() Annotator {
 	}
 }
 
-func WithAttrs(attrs map[string]any) Annotator {
+type Attr struct {
+	key   string
+	value any
+}
+
+func WithAttrs(attrs ...Attr) Annotator {
 	return func(err *Error) {
-		err.attrs = attrs
+		if err.attrs == nil {
+			err.attrs = make(map[string]any, len(attrs))
+		}
+		for _, attr := range attrs {
+			err.attrs[attr.key] = attr.value
+		}
 	}
 }
