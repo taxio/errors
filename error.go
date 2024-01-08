@@ -69,6 +69,10 @@ func Unwrap(err error) error {
 }
 
 func Wrap(err error, annotators ...Annotator) error {
+	if err == nil {
+		return nil
+	}
+
 	e := &Error{
 		message: "",
 		err:     err,
