@@ -87,6 +87,13 @@ func TestWrap(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("wrap nil", func(t *testing.T) {
+		err := errors.Wrap(nil)
+		if err != nil {
+			t.Errorf("expected nil, got %s", err.Error())
+		}
+	})
 }
 
 func TestWithStack(t *testing.T) {
