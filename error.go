@@ -2,6 +2,7 @@ package errors
 
 import (
 	"errors"
+	"runtime"
 	"strings"
 )
 
@@ -10,7 +11,7 @@ type stack []uintptr
 type Error struct {
 	message string
 	err     error
-	stack   *stack
+	stack   stack
 	attrs   map[string]any
 }
 
@@ -33,10 +34,7 @@ func (e *Error) Unwrap() error {
 }
 
 func (e *Error) StackTrace() []uintptr {
-	if e.stack == nil {
-		return nil
-	}
-	return *e.stack
+	return e.stack
 }
 
 func (e *Error) Attributes() map[string]any {
@@ -76,13 +74,8 @@ func Wrap(err error, annotators ...Annotator) error {
 	e := &Error{
 		message: "",
 		err:     err,
-		stack:   nil,
+		stack:   callers(),
 		attrs:   nil,
-	}
-
-	if x, ok := err.(interface{ StackTrace() []uintptr }); ok {
-		s := stack(x.StackTrace())
-		e.stack = &s
 	}
 
 	if x, ok := err.(interface{ Attributes() map[string]any }); ok {
@@ -94,4 +87,10 @@ func Wrap(err error, annotators ...Annotator) error {
 	}
 
 	return e
+}
+
+func callers() stack {
+	var pcs [32]uintptr
+	n := runtime.Callers(3, pcs[:])
+	return pcs[0:n]
 }

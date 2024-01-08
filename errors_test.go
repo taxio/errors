@@ -13,6 +13,13 @@ func TestNew(t *testing.T) {
 	if err.Error() != msg {
 		t.Errorf("expected %s, got %s", msg, err.Error())
 	}
+	var cErr *errors.Error
+	if ok := errors.As(err, &cErr); !ok {
+		t.Fatal("expected error to be *errors.Error")
+	}
+	if len(cErr.StackTrace()) == 0 {
+		t.Errorf("expected stack trace, got empty")
+	}
 }
 
 func TestIs(t *testing.T) {
@@ -94,58 +101,18 @@ func TestWrap(t *testing.T) {
 			t.Errorf("expected nil, got %s", err.Error())
 		}
 	})
-}
 
-func TestWithStack(t *testing.T) {
-	t.Run("new w/ stack", func(t *testing.T) {
-		err := errors.New("stack")
+	t.Run("wrap other error", func(t *testing.T) {
+		err := errors.Wrap(stderr.New("test"))
+		if err.Error() != "test" {
+			t.Errorf("expected test, got %s", err.Error())
+		}
 		var cErr *errors.Error
 		if ok := errors.As(err, &cErr); !ok {
 			t.Fatal("expected error to be *errors.Error")
 		}
 		if len(cErr.StackTrace()) == 0 {
-			t.Errorf("expected stack trace")
-		}
-	})
-
-	t.Run("wrap stderr w/ stack", func(t *testing.T) {
-		baseErr := stderr.New("base")
-		err := errors.Wrap(baseErr, errors.WithStack())
-		var cErr *errors.Error
-		if ok := errors.As(err, &cErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
-		if len(cErr.StackTrace()) == 0 {
-			t.Errorf("expected stack trace")
-		}
-	})
-
-	t.Run("take over", func(t *testing.T) {
-		baseErr := errors.New("base")
-		err := errors.Wrap(baseErr)
-		var baseCErr, wrappedCErr *errors.Error
-		if ok := errors.As(baseErr, &baseCErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
-		if ok := errors.As(err, &wrappedCErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
-		for i, pc := range baseCErr.StackTrace() {
-			if wrappedCErr.StackTrace()[i] != pc {
-				t.Errorf("expected same stack trace")
-			}
-		}
-	})
-
-	t.Run("empty", func(t *testing.T) {
-		baseErr := stderr.New("base")
-		err := errors.Wrap(baseErr)
-		var cErr *errors.Error
-		if ok := errors.As(err, &cErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
-		if len(cErr.StackTrace()) != 0 {
-			t.Errorf("expected no stack trace")
+			t.Errorf("expected stack trace, got empty")
 		}
 	})
 }
