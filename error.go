@@ -2,6 +2,7 @@ package errors
 
 import (
 	"errors"
+	"strings"
 )
 
 type stack []uintptr
@@ -14,13 +15,17 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
-	msg := e.message
+	var msgs []string
+
+	if e.message != "" {
+		msgs = append(msgs, e.message)
+	}
 	if e.err != nil {
 		if len(e.err.Error()) > 0 {
-			msg += ": " + e.err.Error()
+			msgs = append(msgs, e.err.Error())
 		}
 	}
-	return e.message
+	return strings.Join(msgs, ": ")
 }
 
 func (e *Error) Unwrap() error {
@@ -49,7 +54,7 @@ func Is(err, target error) bool {
 }
 
 func As(err error, target any) bool {
-	return errors.As(err, &target)
+	return errors.As(err, target)
 }
 
 func Join(errs ...error) error {
