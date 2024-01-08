@@ -13,10 +13,7 @@ func TestNew(t *testing.T) {
 	if err.Error() != msg {
 		t.Errorf("expected %s, got %s", msg, err.Error())
 	}
-	var cErr *errors.Error
-	if ok := errors.As(err, &cErr); !ok {
-		t.Fatal("expected error to be *errors.Error")
-	}
+	cErr := mustCast(t, err)
 	if len(cErr.StackTrace()) == 0 {
 		t.Errorf("expected stack trace, got empty")
 	}
@@ -107,10 +104,7 @@ func TestWrap(t *testing.T) {
 		if err.Error() != "test" {
 			t.Errorf("expected test, got %s", err.Error())
 		}
-		var cErr *errors.Error
-		if ok := errors.As(err, &cErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
+		cErr := mustCast(t, err)
 		if len(cErr.StackTrace()) == 0 {
 			t.Errorf("expected stack trace, got empty")
 		}
@@ -120,10 +114,7 @@ func TestWrap(t *testing.T) {
 func TestWithAttrs(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		err := errors.New("test")
-		var cErr *errors.Error
-		if ok := errors.As(err, &cErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
+		cErr := mustCast(t, err)
 		if len(cErr.Attributes()) != 0 {
 			t.Errorf("expected 0 attributes, got %d", len(cErr.Attributes()))
 		}
@@ -137,10 +128,7 @@ func TestWithAttrs(t *testing.T) {
 			),
 		)
 		err := errors.Wrap(baseErr)
-		var cErr *errors.Error
-		if ok := errors.As(err, &cErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
+		cErr := mustCast(t, err)
 		if len(cErr.Attributes()) != 1 {
 			t.Errorf("expected 1 attribute, got %d", len(cErr.Attributes()))
 		}
@@ -164,10 +152,7 @@ func TestWithAttrs(t *testing.T) {
 				errors.Attr("key3", "value3"),
 			),
 		)
-		var cErr *errors.Error
-		if ok := errors.As(err, &cErr); !ok {
-			t.Fatal("expected error to be *errors.Error")
-		}
+		cErr := mustCast(t, err)
 		if len(cErr.Attributes()) != 3 {
 			t.Errorf("expected 1 attribute, got %d", len(cErr.Attributes()))
 		}
