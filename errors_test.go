@@ -129,6 +129,18 @@ func TestWithStack(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("empty", func(t *testing.T) {
+		baseErr := stderr.New("base")
+		err := errors.Wrap(baseErr)
+		var cErr *errors.Error
+		if ok := errors.As(err, &cErr); !ok {
+			t.Fatal("expected error to be *errors.Error")
+		}
+		if len(cErr.StackTrace()) != 0 {
+			t.Errorf("expected no stack trace")
+		}
+	})
 }
 
 func TestWithAttrs(t *testing.T) {
