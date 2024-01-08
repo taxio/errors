@@ -33,6 +33,9 @@ func (e *Error) Unwrap() error {
 }
 
 func (e *Error) StackTrace() []uintptr {
+	if e.stack == nil {
+		return nil
+	}
 	return *e.stack
 }
 
