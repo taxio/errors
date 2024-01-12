@@ -33,6 +33,13 @@ func TestIs(t *testing.T) {
 			t.Errorf("expected false, got true")
 		}
 	})
+	t.Run("wrapped", func(t *testing.T) {
+		base := &CustomError{"base"}
+		err := errors.Wrap(base)
+		if !errors.Is(err, base) {
+			t.Errorf("expected true, got false")
+		}
+	})
 }
 
 type CustomError struct {
@@ -60,6 +67,16 @@ func TestAs(t *testing.T) {
 		var target *CustomError
 		if errors.As(err, &target) {
 			t.Errorf("expected false, got true")
+		}
+	})
+
+	t.Run("wrapped type", func(t *testing.T) {
+		baseErr := &CustomError{message: "base"}
+		err := errors.Wrap(baseErr)
+
+		var target *CustomError
+		if !errors.As(err, &target) {
+			t.Errorf("expected true, got false")
 		}
 	})
 }
