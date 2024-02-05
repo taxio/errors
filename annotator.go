@@ -1,8 +1,8 @@
 package errors
 
-type Annotator func(*Error)
+type AnnotatorFunc func(*Error)
 
-func WithMessage(message string) Annotator {
+func WithMessage(message string) AnnotatorFunc {
 	return func(err *Error) {
 		err.message = message
 	}
@@ -17,7 +17,7 @@ func Attr(key string, value any) Attribute {
 	return Attribute{key: key, value: value}
 }
 
-func WithAttrs(attrs ...Attribute) Annotator {
+func WithAttrs(attrs ...Attribute) AnnotatorFunc {
 	return func(err *Error) {
 		if err.attrs == nil {
 			err.attrs = make(map[string]any, len(attrs))

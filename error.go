@@ -66,7 +66,7 @@ func Unwrap(err error) error {
 	return errors.Unwrap(err)
 }
 
-func Wrap(err error, annotators ...Annotator) error {
+func Wrap(err error, annotators ...any) error {
 	if err == nil {
 		return nil
 	}
@@ -83,7 +83,16 @@ func Wrap(err error, annotators ...Annotator) error {
 	}
 
 	for _, annotator := range annotators {
-		annotator(e)
+		switch a := any(annotator).(type) {
+		case string:
+			WithMessage(a)(e)
+		case Attribute:
+			WithAttrs(a)(e)
+		case AnnotatorFunc:
+			a(e)
+		default:
+			// Do nothing (or should I panic?)
+		}
 	}
 
 	return e
