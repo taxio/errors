@@ -92,19 +92,19 @@ func TestWrap(t *testing.T) {
 		},
 		"with message": {
 			err:  errors.Wrap(stderr.New("base"), "wrap"),
-			want: `wrap: base`,
+			want: "wrap: base",
 		},
 		"with message function": {
 			err:  errors.Wrap(stderr.New("base"), errors.WithMessage("wrap")),
-			want: `wrap: base`,
+			want: "wrap: base",
 		},
 		"with no message": {
 			err:  errors.Wrap(stderr.New(""), errors.WithMessage("wrap")),
-			want: `wrap`,
+			want: "wrap",
 		},
 		"with unsupported annotator": {
 			err:  errors.Wrap(stderr.New("nothing"), 123),
-			want: `nothing`,
+			want: "nothing",
 		},
 	}
 
@@ -209,7 +209,7 @@ func TestUnwrap(t *testing.T) {
 				),
 				errors.WithMessage("wrap2"),
 			),
-			wantMessage: `wrap: base`,
+			wantMessage: "wrap: base",
 		},
 		"no wrap": {
 			err:     errors.New("base"),
