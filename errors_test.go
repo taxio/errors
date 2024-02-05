@@ -91,12 +91,20 @@ func TestWrap(t *testing.T) {
 			want: "base",
 		},
 		"with message": {
+			err:  errors.Wrap(stderr.New("base"), "wrap"),
+			want: "wrap: base",
+		},
+		"with message function": {
 			err:  errors.Wrap(stderr.New("base"), errors.WithMessage("wrap")),
-			want: `wrap: base`,
+			want: "wrap: base",
 		},
 		"with no message": {
 			err:  errors.Wrap(stderr.New(""), errors.WithMessage("wrap")),
-			want: `wrap`,
+			want: "wrap",
+		},
+		"with unsupported annotator": {
+			err:  errors.Wrap(stderr.New("nothing"), 123),
+			want: "nothing",
 		},
 	}
 
@@ -157,10 +165,8 @@ func TestWithAttrs(t *testing.T) {
 	t.Run("overwrite", func(t *testing.T) {
 		baseErr := errors.Wrap(
 			errors.New("base"),
-			errors.WithAttrs(
-				errors.Attr("key1", "value1"),
-				errors.Attr("key2", "value2"),
-			),
+			errors.Attr("key1", "value1"),
+			errors.Attr("key2", "value2"),
 		)
 		err := errors.Wrap(
 			baseErr,
@@ -203,7 +209,7 @@ func TestUnwrap(t *testing.T) {
 				),
 				errors.WithMessage("wrap2"),
 			),
-			wantMessage: `wrap: base`,
+			wantMessage: "wrap: base",
 		},
 		"no wrap": {
 			err:     errors.New("base"),
