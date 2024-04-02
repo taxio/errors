@@ -41,13 +41,19 @@ func (e *Error) Attributes() map[string]any {
 	return e.attrs
 }
 
-func New(message string) error {
-	return &Error{
+func New(message string, annotators ...any) error {
+	err := &Error{
 		message: message,
 		err:     nil,
 		stack:   callers(),
 		attrs:   nil,
 	}
+
+	if len(annotators) == 0 {
+		return err
+	}
+
+	return wrap(err, annotators...)
 }
 
 func Is(err, target error) bool {
@@ -82,20 +88,23 @@ func Wrap(err error, annotators ...any) error {
 		e.attrs = x.Attributes()
 	}
 
+	return wrap(e, annotators...)
+}
+
+func wrap(err *Error, annotators ...any) error {
 	for _, annotator := range annotators {
-		switch a := any(annotator).(type) {
+		switch a := annotator.(type) {
 		case string:
-			WithMessage(a)(e)
+			WithMessage(a)(err)
 		case Attribute:
-			WithAttrs(a)(e)
+			WithAttrs(a)(err)
 		case AnnotatorFunc:
-			a(e)
+			a(err)
 		default:
 			// Do nothing (or should I panic?)
 		}
 	}
-
-	return e
+	return err
 }
 
 func callers() stack {
