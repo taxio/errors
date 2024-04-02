@@ -34,6 +34,17 @@ func TestNew(t *testing.T) {
 		if len(cErr.StackTrace()) == 0 {
 			t.Errorf("expected stack trace, got empty")
 		}
+		if v, ok := cErr.Attributes()["key"]; !ok {
+			t.Errorf("unexpected attributes")
+		} else {
+			vStr, ok := v.(string)
+			if !ok {
+				t.Fatal("unexpected type")
+			}
+			if vStr != "value" {
+				t.Errorf("expected value, got %s", vStr)
+			}
+		}
 	})
 }
 
