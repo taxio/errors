@@ -4,7 +4,15 @@ type AnnotatorFunc func(*Error)
 
 func WithMessage(message string) AnnotatorFunc {
 	return func(err *Error) {
-		err.message = message
+		if message == "" {
+			return
+		}
+
+		if err.message == "" {
+			err.message = message
+		} else {
+			err.message = message + ": " + err.message
+		}
 	}
 }
 

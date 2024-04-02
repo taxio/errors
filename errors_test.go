@@ -8,15 +8,33 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	msg := "test"
-	err := errors.New(msg)
-	if err.Error() != msg {
-		t.Errorf("expected %s, got %s", msg, err.Error())
-	}
-	cErr := mustCast(t, err)
-	if len(cErr.StackTrace()) == 0 {
-		t.Errorf("expected stack trace, got empty")
-	}
+	t.Run("with no annotators", func(t *testing.T) {
+		msg := "test"
+		err := errors.New(msg)
+		if err.Error() != msg {
+			t.Errorf("expected %s, got %s", msg, err.Error())
+		}
+		cErr := mustCast(t, err)
+		if len(cErr.StackTrace()) == 0 {
+			t.Errorf("expected stack trace, got empty")
+		}
+	})
+	t.Run("with annotators", func(t *testing.T) {
+		msg := "test"
+		err := errors.New(
+			msg,
+			errors.WithMessage("message"),
+			errors.Attr("key", "value"),
+		)
+		wantMsg := "message: test"
+		if err.Error() != wantMsg {
+			t.Errorf("expected %s, got %s", wantMsg, err.Error())
+		}
+		cErr := mustCast(t, err)
+		if len(cErr.StackTrace()) == 0 {
+			t.Errorf("expected stack trace, got empty")
+		}
+	})
 }
 
 func TestIs(t *testing.T) {
@@ -101,6 +119,14 @@ func TestWrap(t *testing.T) {
 		"with no message": {
 			err:  errors.Wrap(stderr.New(""), errors.WithMessage("wrap")),
 			want: "wrap",
+		},
+		"with multi messages": {
+			err:  errors.Wrap(stderr.New("base"), "wrap1", "wrap2"),
+			want: "wrap2: wrap1: base",
+		},
+		"with blank message": {
+			err:  errors.Wrap(stderr.New("base"), ""),
+			want: "base",
 		},
 		"with unsupported annotator": {
 			err:  errors.Wrap(stderr.New("nothing"), 123),
