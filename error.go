@@ -56,6 +56,10 @@ func New(message string, annotators ...any) error {
 	return wrap(err, annotators...)
 }
 
+func Const(message string) error {
+	return New(message, WithNoStackTrace())
+}
+
 func Is(err, target error) bool {
 	return errors.Is(err, target)
 }

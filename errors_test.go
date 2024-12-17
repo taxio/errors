@@ -310,3 +310,17 @@ func TestJoin(t *testing.T) {
 		})
 	}
 }
+
+func TestConst(t *testing.T) {
+	err := errors.Const("test")
+	if err == nil {
+		t.Fatal("got nil error")
+	}
+	if err.Error() != "test" {
+		t.Errorf("expected test, got %s", err.Error())
+	}
+	cErr := mustCast(t, err)
+	if len(cErr.StackTrace()) != 0 {
+		t.Errorf("expected no stack trace, got %d", len(cErr.StackTrace()))
+	}
+}
