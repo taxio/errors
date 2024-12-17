@@ -35,3 +35,9 @@ func WithAttrs(attrs ...Attribute) AnnotatorFunc {
 		}
 	}
 }
+
+func WithNoStackTrace() AnnotatorFunc {
+	return func(err *Error) {
+		err.stack = nil
+	}
+}
