@@ -307,6 +307,11 @@ func TestJoin(t *testing.T) {
 			if err.Error() != tt.want {
 				t.Errorf("expected %s, got %s", tt.want, err.Error())
 			}
+			for _, e := range tt.errs {
+				if !errors.Is(err, e) {
+					t.Errorf("expected %s to be in %s", e.Error(), err.Error())
+				}
+			}
 		})
 	}
 }

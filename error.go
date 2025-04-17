@@ -69,7 +69,7 @@ func As(err error, target any) bool {
 }
 
 func Join(errs ...error) error {
-	return errors.Join(errs...)
+	return Wrap(errors.Join(errs...))
 }
 
 func Unwrap(err error) error {

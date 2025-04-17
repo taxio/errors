@@ -70,6 +70,23 @@ func TestBaseStackTrace(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("joined error", func(t *testing.T) {
+		err1 := errors.New("err1")
+		err2 := errors.New("err2")
+		joinedErr := errors.Join(err1, err2)
+		cJoinedErr := mustCast(t, joinedErr)
+
+		got := errors.BaseStackTrace(joinedErr)
+		if len(cJoinedErr.StackTrace()) != len(got) {
+			t.Fatalf("expected %d, got %d", len(cJoinedErr.StackTrace()), len(got))
+		}
+		for i, st := range cJoinedErr.StackTrace() {
+			if got[i] != st {
+				t.Errorf("expected %v, got %v", st, got[i])
+			}
+		}
+	})
 }
 
 func mustCast(t *testing.T, err error) *errors.Error {
